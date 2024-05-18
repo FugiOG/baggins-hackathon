@@ -3,19 +3,21 @@ import numpy as np
 from convertData import convertDataService
 
 
-def getDataTemperature():
-    print()
-
-
 def convertObjectFieldToNumber(df: pd.DataFrame):
     df.phenomenon = convertDataService.convertPhenomenonColumn(df.phenomenon)
     df.date = convertDataService.convertDateColumn(df.date)
     df.sedges = convertDataService.convertSedgesColumn(df.sedges)
     df.cloudiness = convertDataService.convertCloudinessColumn(df.cloudiness)
-    print(df.head(30))
 
 def deleteNight(df: pd.DataFrame):
-    return df[df['date'].dt.hour >= 9]
+    return df[df['date'].dt.hour >= 9].reset_index()
+
+def groupRowsByDay(df: pd.DataFrame):
+    df['date'] = df['date'].dt.date
+
+    return df.groupby('date').agg(
+        {'temperature': 'mean', 'humidity': 'mean', 'windSpeed': 'mean', 'cloudiness': 'mean', 'phenomenon': 'mean',
+         'visibility': 'mean', 'sedges': 'mean'}).reset_index()
 
 def main():
     pd.set_option('display.max_columns', None)
@@ -25,6 +27,9 @@ def main():
                  'Ff': 'windSpeed', 'N': 'cloudiness', 'VV': 'visibility', 'RRR': 'sedges'})
     convertObjectFieldToNumber(df)
     df = deleteNight(df)
+    print(df.head(30))
+    df = groupRowsByDay(df)
+    print(df.head(30))
 
 
 main()
