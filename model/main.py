@@ -10,7 +10,11 @@ def getDataTemperature():
 def convertObjectFieldToNumber(df: pd.DataFrame):
     df.phenomenon = convertDataService.convertPhenomenonColumn(df.phenomenon)
     df.date = convertDataService.convertDateColumn(df.date)
-    print(df.head(6))
+    df.sedges = convertDataService.convertSedgesColumn(df.sedges)
+
+
+def deleteNight(df: pd.DataFrame):
+    return df[df['date'].dt.hour >= 9]
 
 
 def main():
@@ -19,8 +23,8 @@ def main():
     df = df.rename(
         columns={'WW': 'phenomenon', 'Местное время в Санкт-Петербурге': 'date', 'T': 'temperature', 'U': 'humidity',
                  'Ff': 'windSpeed', 'N': 'cloudiness', 'VV': 'visibility', 'RRR': 'sedges'})
-    print(df.info())
     convertObjectFieldToNumber(df)
+    df = deleteNight(df)
 
 
 main()
