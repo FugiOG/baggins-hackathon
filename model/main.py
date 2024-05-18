@@ -11,11 +11,11 @@ def convertObjectFieldToNumber(df: pd.DataFrame):
     df.phenomenon = convertDataService.convertPhenomenonColumn(df.phenomenon)
     df.date = convertDataService.convertDateColumn(df.date)
     df.sedges = convertDataService.convertSedgesColumn(df.sedges)
-
+    df.cloudiness = convertDataService.convertCloudinessColumn(df.cloudiness)
+    print(df.head(30))
 
 def deleteNight(df: pd.DataFrame):
     return df[df['date'].dt.hour >= 9]
-
 
 def main():
     pd.set_option('display.max_columns', None)
