@@ -1,5 +1,6 @@
 from constants import PHENOMENON_FIELD_MAP
 from constants import SEDGES_FIELD_MAP
+from constants import CLOUDINESS_FIELD_MAP
 import pandas as pd
 
 
@@ -11,6 +12,10 @@ class ConvertDataService:
     @staticmethod
     def convertDateColumn(dateColumn):
         return pd.to_datetime(dateColumn)
+
+    @staticmethod
+    def convertCloudinessColumn(cloudinessColumn):
+        return [CLOUDINESS_FIELD_MAP[cloudiness] for cloudiness in cloudinessColumn]
 
     @staticmethod
     def convertSedgesColumn(sedgesColumn):
