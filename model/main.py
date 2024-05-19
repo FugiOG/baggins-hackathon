@@ -1,6 +1,12 @@
 import pandas as pd
 from convertData import convertDataService
 from seasons import Seasons
+# import matplotlib.pyplot as plt
+# from adtk.detector import ThresholdAD
+# from adtk.visualization import plot
+from coffeeshop import Coffeeshop
+
+COFFEESHOP_DATA_PATH = './assets/data.xlsx'
 
 
 def convertObjectFieldToNumber(df: pd.DataFrame):
@@ -22,50 +28,46 @@ def groupRowsByDay(df: pd.DataFrame):
          'visibility': 'mean', 'sedges': 'mean'}).reset_index()
 
 
-def enrichWeatherTable(df: pd.DataFrame):
-    file_path = './assets/data.xlsx'
-    store1_df = pd.read_excel(file_path, sheet_name='Первая')
-    store2_df = pd.read_excel(file_path, sheet_name='Вторая')
-    store3_df = pd.read_excel(file_path, sheet_name='Третья')
-
-    store1_df['Дата'] = pd.to_datetime(store1_df['Дата'], format='%d.%m.%Y')
-    store2_df['Дата'] = pd.to_datetime(store2_df['Дата'], format='%d.%м.%Y')
-    store3_df['Дата'] = pd.to_datetime(store3_df['Дата'], format='%d.%m.%Y')
-
-    store1_df['Дата'] = store1_df['Дата'].dt.date
-    store2_df['Дата'] = store2_df['Дата'].dt.date
-    store3_df['Дата'] = store3_df['Дата'].dt.date
-
-    store1_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount1', 'Товарооборот': 'turnover1'},
-                     inplace=True)
-    store2_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount2', 'Товарооборот': 'turnover2'},
-                     inplace=True)
-    store3_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount3', 'Товарооборот': 'turnover3'},
-                     inplace=True)
-
-    merged_df = df.merge(store1_df, on='date', how='left') \
-        .merge(store2_df, on='date', how='left') \
-        .merge(store3_df, on='date', how='left')
-
-    return merged_df
-
+def enrichWeatherTable(df: pd.DataFrame, coffeeshop):
+    return df.merge(coffeeshop, on='date', how='left')
 
 def main():
     pd.set_option('display.max_columns', None)
     df = pd.read_excel('./assets/valid_data.xlsx')
+
+    coffeeshop1 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Первая', 1)
+    coffeeshop2 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Вторая', 2)
+    coffeeshop3 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Третья', 3)
+
     df = df.rename(
         columns={'WW': 'phenomenon', 'Местное время в Санкт-Петербурге': 'date', 'T': 'temperature', 'U': 'humidity',
                  'Ff': 'windSpeed', 'N': 'cloudiness', 'VV': 'visibility', 'RRR': 'sedges'})
     convertObjectFieldToNumber(df)
     df = deleteNight(df)
     df = groupRowsByDay(df)
-    df = enrichWeatherTable(df)
+    print(coffeeshop3.df)
+
+    df = enrichWeatherTable(df, coffeeshop1.df)
+    df = enrichWeatherTable(df, coffeeshop2.df)
+    df = enrichWeatherTable(df, coffeeshop3.df)
+
+    print(df)
 
     seasons = Seasons(df)
 
     seasons.displayFirstsElement('winter')
     seasons.displayHeatMap('autumn')
     # trainingPredictTurnover(winter_df)
+
+    coffeeshop1.displayTurnoverFrequency()
+    print(coffeeshop3.df)
+    coffeeshop3.displayTurnoverFrequency()
+
+    # coffeeshop3.getAnomalies()
+
+    # threshold_ad = ThresholdAD(high=24000, low=6500)
+    # anomalies = threshold_ad.detect(coffeeshop3.dfWithoutCounts)
+    # plot(coffeeshop3.df, anomaly=anomalies, ts_linewidth=1, ts_markersize=3, anomaly_markersize=5, anomaly_color='red', anomaly_tag="marker")
 
 
 main()
