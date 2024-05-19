@@ -31,6 +31,7 @@ def groupRowsByDay(df: pd.DataFrame):
 def enrichWeatherTable(df: pd.DataFrame, coffeeshop):
     return df.merge(coffeeshop, on='date', how='left')
 
+
 def main():
     pd.set_option('display.max_columns', None)
     df = pd.read_excel('./assets/valid_data.xlsx')
@@ -45,29 +46,14 @@ def main():
     convertObjectFieldToNumber(df)
     df = deleteNight(df)
     df = groupRowsByDay(df)
-    print(coffeeshop3.df)
 
     df = enrichWeatherTable(df, coffeeshop1.df)
     df = enrichWeatherTable(df, coffeeshop2.df)
     df = enrichWeatherTable(df, coffeeshop3.df)
 
-    print(df)
-
     seasons = Seasons(df)
 
-    seasons.displayFirstsElement('winter')
-    seasons.displayHeatMap('autumn')
-    # trainingPredictTurnover(winter_df)
-
-    coffeeshop1.displayTurnoverFrequency()
-    print(coffeeshop3.df)
-    coffeeshop3.displayTurnoverFrequency()
-
-    # coffeeshop3.getAnomalies()
-
-    # threshold_ad = ThresholdAD(high=24000, low=6500)
-    # anomalies = threshold_ad.detect(coffeeshop3.dfWithoutCounts)
-    # plot(coffeeshop3.df, anomaly=anomalies, ts_linewidth=1, ts_markersize=3, anomaly_markersize=5, anomaly_color='red', anomaly_tag="marker")
+    coffeeshop1.autoArima()
 
 
 main()
