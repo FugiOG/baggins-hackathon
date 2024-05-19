@@ -11,7 +11,7 @@ class ConvertDataService:
 
     @staticmethod
     def convertDateColumn(dateColumn):
-        return pd.to_datetime(dateColumn)
+        return pd.to_datetime(dateColumn, format='%d.%m.%Y %H:%M')
 
     @staticmethod
     def convertCloudinessColumn(cloudinessColumn):
