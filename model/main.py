@@ -1,10 +1,11 @@
 import pandas as pd
 from convertData import convertDataService
 from seasons import Seasons
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 # from adtk.detector import ThresholdAD
 # from adtk.visualization import plot
 from coffeeshop import Coffeeshop
+from comfortCalculator import calculateComfortIndex, displayCC
 
 COFFEESHOP_DATA_PATH = './assets/data.xlsx'
 
@@ -31,6 +32,50 @@ def groupRowsByDay(df: pd.DataFrame):
 def enrichWeatherTable(df: pd.DataFrame, coffeeshop):
     return df.merge(coffeeshop, on='date', how='left')
 
+def addComfortCoefficientColumnAlt(df: pd.DataFrame):
+    comfortIndeces = []
+    for index, row in df.iterrows():
+        comfortIndex = calculateComfortIndex(row)
+        comfortIndeces.append(comfortIndex)
+
+    coefs = []
+    for comfortIndex in comfortIndeces:
+        min_ci = min(comfortIndeces)
+        max_ci = max(comfortIndeces)
+        coef = (comfortIndex - min_ci) / (max_ci - min_ci)
+        coefs.append(coef)
+    df['CC'] = coefs
+
+    return df
+
+def addComfortCoefficientColumn(df: pd.DataFrame):
+    comfortIndeces = []
+    for index, row in df.iterrows():
+        comfortIndex = calculateComfortIndex(row)
+
+        comfortIndex -= (1 * row['cloudiness'] / 100)
+
+        # Учет влияния феномена на индекс комфорта
+        comfortIndex -= 5*row['phenomenon']
+
+        # Учет влияния видимости на индекс комфорта (можно дополнительно уточнить формулу)
+        # Например, уменьшение индекса комфорта при низкой видимости
+        if row['visibility'] < 5:  # Пример: если видимость менее 5 км
+            comfortIndex -= 7
+
+        # Учет влияния осадков на индекс комфорта
+        comfortIndex -= (2 * row['sedges'])
+        comfortIndeces.append(comfortIndex)
+
+    coefs = []
+    for comfortIndex in comfortIndeces:
+        min_ci = min(comfortIndeces)
+        max_ci = max(comfortIndeces)
+        coef = (comfortIndex - min_ci) / (max_ci - min_ci)
+        coefs.append(coef)
+    df['CC'] = coefs
+
+    return df
 
 def main():
     pd.set_option('display.max_columns', None)
@@ -46,6 +91,7 @@ def main():
     convertObjectFieldToNumber(df)
     df = deleteNight(df)
     df = groupRowsByDay(df)
+    df = addComfortCoefficientColumn(df)
 
     df = enrichWeatherTable(df, coffeeshop1.df)
     df = enrichWeatherTable(df, coffeeshop2.df)

@@ -1,6 +1,8 @@
 import math
+import matplotlib.pyplot as plt
 
-def heat_index(temperature, humidity):
+
+def heat_index(temperature: float, humidity: float):
     """
     Рассчитывает температурно-влажностный индекс (Heat Index).
     Параметры:
@@ -13,7 +15,8 @@ def heat_index(temperature, humidity):
     hi = temperature - ((0.55 - 0.0055 * humidity) * (temperature - 14.5))
     return hi
 
-def wind_chill(temperature, wind_speed):
+
+def wind_chill(temperature: float, wind_speed: float):
     """
     Рассчитывает индекс охлаждения ветром (Wind Chill Index).
     Параметры:
@@ -23,10 +26,12 @@ def wind_chill(temperature, wind_speed):
     Возвращает:
     Wind Chill Index (°C)
     """
-    wci = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_speed, 0.16) + 0.3965 * temperature * math.pow(wind_speed, 0.16)
+    wci = 13.12 + 0.6215 * temperature - 11.37 * math.pow(wind_speed, 0.16) + 0.3965 * temperature * math.pow(
+        wind_speed, 0.16)
     return wci
 
-def comfort_index(temperature, humidity, wind_speed):
+
+def calculateComfortIndex(row):
     """
     Рассчитывает общий индекс комфорта.
     Параметры:
@@ -37,10 +42,28 @@ def comfort_index(temperature, humidity, wind_speed):
     Возвращает:
     Comfort Index (°C)
     """
+    temperature = row['temperature']
+    humidity = row['humidity']
+    wind_speed = row['windSpeed']
     hi = heat_index(temperature, humidity)
     wci = wind_chill(temperature, wind_speed)
     ci = (hi + wci) / 2
     return ci
+
+
+def displayCC(df):
+    dates = df['date']  # Предполагается, что столбец 'date' содержит даты в формате datetime
+    comfort_indices = df['CC']
+
+    # Построение графика
+    plt.figure(figsize=(10, 6))
+    plt.bar(dates, comfort_indices, color='skyblue', alpha=0.7)  # Создание столбчатой диаграммы
+    plt.xlabel('Дата')
+    plt.ylabel('Кэф комфорта')
+    plt.title('Кэф по датам')
+    plt.xticks(rotation=45)  # Поворот меток по оси X на 45 градусов для лучшей читаемости
+    plt.tight_layout()  # Автоматическое регулирование макета графика
+    plt.show()
 
     """
     Градация индекса комфорта
