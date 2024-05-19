@@ -18,7 +18,7 @@ class Coffeeshop(Metrics):
     def __init__(self, filePath, pageName, id):
         df = pd.read_excel(filePath, sheet_name=pageName)
 
-        df['Дата'] = pd.to_datetime(df['Дата'], format='%Y-%m-%d')
+        df['Дата'] = pd.to_datetime(df['Дата'], format='%d.%m.%Y')
         df['Дата'] = df['Дата'].dt.date
 
         df.rename(columns={'Дата': 'date', 'Кол-во заказов': f'ordersCount_{id}', 'Товарооборот': f'turnover_{id}'},
