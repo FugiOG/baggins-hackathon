@@ -51,9 +51,13 @@ def main():
     df = enrichWeatherTable(df, coffeeshop2.df)
     df = enrichWeatherTable(df, coffeeshop3.df)
 
+    df = df.dropna(subset=['turnover_1', 'turnover_2', 'turnover_3']).reset_index()
     seasons = Seasons(df)
+    # seasons.dfs['winter'].LSTMModel()
+
+    # seasons.createSeasonDf()
 
     coffeeshop1.autoArima()
-
+    # coffeeshop1.randomForest()
 
 main()
