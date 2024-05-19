@@ -3,6 +3,7 @@ from convertData import convertDataService
 import matplotlib.pyplot as plt
 import seaborn as sns
 from training import trainingPredictTurnover
+from seasons import Seasons
 
 def convertObjectFieldToNumber(df: pd.DataFrame):
     df.phenomenon = convertDataService.convertPhenomenonColumn(df.phenomenon)
@@ -72,20 +73,10 @@ def main():
     df = groupRowsByDay(df)
     df = enrichWeatherTable(df)
 
-    df['season'] = df['date'].apply(get_season)
-    winter_df = df[df['season'] == 'Winter']
-    sprint_df = df[df['season'] == 'Spring']
-    winter_df = winter_df.drop(columns=['date', 'season'])
-    # plt.figure(figsize=(14, 12))
-    # sns.heatmap(df.corr(), annot=True, annot_kws={"size": 14})
-    # sns.set_style("white")
-    # plt.xticks(rotation=90, fontsize=14)
-    # plt.yticks(fontsize=14)
-    # plt.show()
-    # print(df.head(5))
-    winter_df = winter_df.drop(columns=['turnover2', 'turnover3', 'ordersCount1', 'ordersCount2', 'ordersCount3'])
-    winter_df = winter_df.dropna(subset=['turnover1'])
-    # winter = df[df['date'].dt.month > 11].reset_index()
-    trainingPredictTurnover(winter_df)
+    seasons = Seasons(df)
+
+    seasons.displayFirstsElement('winter')
+    seasons.displayHeatMap('autumn')
+    # trainingPredictTurnover(winter_df)
 
 main()
