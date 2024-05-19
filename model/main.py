@@ -1,5 +1,6 @@
 import pandas as pd
 from convertData import convertDataService
+from seasons import Seasons
 
 
 def convertObjectFieldToNumber(df: pd.DataFrame):
@@ -8,8 +9,10 @@ def convertObjectFieldToNumber(df: pd.DataFrame):
     df.sedges = convertDataService.convertSedgesColumn(df.sedges)
     df.cloudiness = convertDataService.convertCloudinessColumn(df.cloudiness)
 
+
 def deleteNight(df: pd.DataFrame):
     return df[df['date'].dt.hour >= 9].reset_index()
+
 
 def groupRowsByDay(df: pd.DataFrame):
     df['date'] = df['date'].dt.date
@@ -17,6 +20,7 @@ def groupRowsByDay(df: pd.DataFrame):
     return df.groupby('date').agg(
         {'temperature': 'mean', 'humidity': 'mean', 'windSpeed': 'mean', 'cloudiness': 'mean', 'phenomenon': 'mean',
          'visibility': 'mean', 'sedges': 'mean'}).reset_index()
+
 
 def enrichWeatherTable(df: pd.DataFrame):
     file_path = './assets/data.xlsx'
@@ -32,15 +36,19 @@ def enrichWeatherTable(df: pd.DataFrame):
     store2_df['Дата'] = store2_df['Дата'].dt.date
     store3_df['Дата'] = store3_df['Дата'].dt.date
 
-    store1_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount1', 'Товарооборот': 'turnover1'}, inplace=True)
-    store2_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount2', 'Товарооборот': 'turnover2'}, inplace=True)
-    store3_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount3  ', 'Товарооборот': 'turnover3'}, inplace=True)
+    store1_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount1', 'Товарооборот': 'turnover1'},
+                     inplace=True)
+    store2_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount2', 'Товарооборот': 'turnover2'},
+                     inplace=True)
+    store3_df.rename(columns={'Дата': 'date', 'Кол-во заказов': 'ordersCount3', 'Товарооборот': 'turnover3'},
+                     inplace=True)
 
     merged_df = df.merge(store1_df, on='date', how='left') \
         .merge(store2_df, on='date', how='left') \
         .merge(store3_df, on='date', how='left')
 
     return merged_df
+
 
 def main():
     pd.set_option('display.max_columns', None)
@@ -52,7 +60,12 @@ def main():
     df = deleteNight(df)
     df = groupRowsByDay(df)
     df = enrichWeatherTable(df)
-    print(df.head(5))
+
+    seasons = Seasons(df)
+
+    seasons.displayFirstsElement('winter')
+    seasons.displayHeatMap('autumn')
+    # trainingPredictTurnover(winter_df)
 
 
 main()
