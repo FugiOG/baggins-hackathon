@@ -1,15 +1,9 @@
 import pandas as pd
-from convertData import convertDataService
-from seasons import Seasons
 import matplotlib.pyplot as plt
-# from adtk.detector import ThresholdAD
-# from adtk.visualization import plot
-import seaborn as sns
+
 from coffeeshop import Coffeeshop
+from convertData import convertDataService
 from comfortCalculator import calculateComfortIndex, displayCC
-
-COFFEESHOP_DATA_PATH = './assets/data.xlsx'
-
 
 def convertObjectFieldToNumber(df: pd.DataFrame):
     df.phenomenon = convertDataService.convertPhenomenonColumn(df.phenomenon)
@@ -94,46 +88,3 @@ def displayPlot(df: pd.DataFrame):
     # Автоматическая подгонка макета
     plt.tight_layout()
     plt.show()
-
-def main():
-    pd.set_option('display.max_columns', None)
-    df = pd.read_excel('./assets/valid_data.xlsx')
-
-    coffeeshop1 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Первая', 1)
-    coffeeshop2 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Вторая', 2)
-    coffeeshop3 = Coffeeshop(COFFEESHOP_DATA_PATH, 'Третья', 3)
-
-    df = df.rename(
-        columns={'WW': 'phenomenon', 'Местное время в Санкт-Петербурге': 'date', 'T': 'temperature', 'U': 'humidity',
-                 'Ff': 'windSpeed', 'N': 'cloudiness', 'VV': 'visibility', 'RRR': 'sedges'})
-    convertObjectFieldToNumber(df)
-    df = deleteNight(df)
-    df = groupRowsByDay(df)
-    df = addComfortCoefficientColumn(df)
-
-    displayCC(df)
-
-    #df = enrichWeatherTable(df, coffeeshop1.df)
-    #df.to_excel("output.xlsx")
-    #df = enrichWeatherTable(df, coffeeshop2.df)
-    #df = enrichWeatherTable(df, coffeeshop3.df)
-
-    coeffs = df[(df['date'] >= pd.to_datetime('2023-03-01')) & (df['date'] <= pd.to_datetime('2023-03-30'))]['CC'].tolist()
-    print(df)
-
-    #df = df.dropna(subset=['turnover_1', 'turnover_2', 'turnover_3']).reset_index()
-    #seasons = Seasons(df)
-    # seasons.dfs['winter'].LSTMModel()
-
-    # seasons.createSeasonDf()
-
-    pr_df = getPredict(coeffs=coeffs, coffeeshop=coffeeshop1)
-    pr_df2 = getPredict(coeffs=coeffs, coffeeshop=coffeeshop1)
-    pr_df3 = getPredict(coeffs=coeffs, coffeeshop=coffeeshop1)
-    displayPlot(pr_df)
-    displayPlot(pr_df2)
-    displayPlot(pr_df3)
-    # coffeeshop1.randomForest()
-
-
-main()

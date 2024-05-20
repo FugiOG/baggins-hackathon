@@ -1,6 +1,6 @@
 import math
 import matplotlib.pyplot as plt
-
+import pandas as pd
 
 def heat_index(temperature: float, humidity: float):
     """
@@ -62,6 +62,36 @@ def displayCC(df):
     plt.ylabel('Кэф комфорта')
     plt.title('Кэф по датам')
     plt.xticks(rotation=45)  # Поворот меток по оси X на 45 градусов для лучшей читаемости
+    plt.tight_layout()  # Автоматическое регулирование макета графика
+    plt.show()
+
+def displayCCC(df1, df2):
+     # Предполагается, что столбец 'date' содержит даты в формате datetime, а столбец 'CC' - коэффициенты комфорта
+    df1 = df1[['date', 'CC']].rename(columns={'CC': 'CC1'})
+    df2 = df2[['date', 'CC']].rename(columns={'CC': 'CC2'})
+    # Объединение двух DataFrame по столбцу 'date'
+    df_combined = pd.merge(df1, df2, on='date', how='outer').sort_values('date')
+
+    # Извлечение данных для построения графика
+    dates = df_combined['date']
+    comfort_indices1 = df_combined['CC1']
+    comfort_indices2 = df_combined['CC2']
+
+    # Построение графика
+    plt.figure(figsize=(12, 6))
+    width = 0.4  # Ширина столбцов
+
+    # Построение столбцов для первого DataFrame
+    plt.bar(dates - pd.Timedelta(days=0.2), comfort_indices1, width=width, color='skyblue', alpha=0.7, label='DF1')
+
+    # Построение столбцов для второго DataFrame
+    plt.bar(dates + pd.Timedelta(days=0.2), comfort_indices2, width=width, color='salmon', alpha=0.7, label='DF2')
+
+    plt.xlabel('Дата')
+    plt.ylabel('Коэффициент комфорта')
+    plt.title('Коэффициент комфорта по датам для двух DataFrame')
+    plt.xticks(rotation=45)  # Поворот меток по оси X на 45 градусов для лучшей читаемости
+    plt.legend()
     plt.tight_layout()  # Автоматическое регулирование макета графика
     plt.show()
 
