@@ -35,6 +35,11 @@ class Coffeeshop(Metrics):
         self.train_turnover = turnover[:split_index]
         self.test_turnover = turnover[split_index:]
 
+        ordersCount = self._df[f'ordersCount_{id}']
+        self.train_ordersCount = ordersCount[:split_index]
+        self.test_ordersCount = ordersCount[split_index:
+
+                            ]
     @property
     def df(self):
         return self._df
@@ -49,6 +54,7 @@ class Coffeeshop(Metrics):
         model.fit(self.train_turnover)
         predictions = model.predict(n_periods=len(self.test_turnover))
         self.displayMetrics(self.test_turnover, predictions)
+        return model
 
     def randomForest(self):
         model = RandomForestRegressor(n_estimators=500)
@@ -56,6 +62,18 @@ class Coffeeshop(Metrics):
         predictions = model.predict(self.test_turnover)
         self.displayMetrics(self.test_turnover, predictions)
 
+    def autoArimaOrdersCount(self):
+        model = auto_arima(self.train_ordersCount, seasonal=False, stepwise=True, trace=False)
+        model.fit(self.train_ordersCount)
+        predictions = model.predict(n_periods=len(self.test_ordersCount))
+        self.displayMetrics(self.test_ordersCount, predictions)
+        return model
+
+    def randomForestOrdersCount(self):
+        model = RandomForestRegressor(n_estimators=500)
+        model.fit(self.train_ordersCount)
+        predictions = model.predict(self.test_ordersCount)
+        self.displayMetrics(self.test_ordersCount, predictions)
     # def metrics(self, predictions):
     #
     #     print("Тест на стационарность:")
