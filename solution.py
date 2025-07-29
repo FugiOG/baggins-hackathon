@@ -1,3 +1,13 @@
+import sys
+
+
+input = sys.stdin.readline
+
+n, k = map(int, input().split())
+a = list(map(int, input().split()))
+
+# Добавьте сюда решение задачи
+
 def can_give_length(worms, k, length):
     """Проверяет, можно ли получить k кусочков длины length из червячков"""
     if length == 0:
@@ -10,27 +20,19 @@ def can_give_length(worms, k, length):
             return True
     return count >= k
 
-def solve():
-    # Читаем входные данные
-    n, k = map(int, input().split())
-    worms = list(map(int, input().split()))
-    
-    # Бинарный поиск по длине
-    left = 0
-    right = max(worms)
-    
-    answer = 0
-    
-    while left <= right:
-        mid = (left + right) // 2
-        
-        if can_give_length(worms, k, mid):
-            answer = mid
-            left = mid + 1
-        else:
-            right = mid - 1
-    
-    print(answer)
+# Бинарный поиск по длине
+left = 0
+right = max(a)
 
-if __name__ == "__main__":
-    solve()
+answer = 0
+
+while left <= right:
+    mid = (left + right) // 2
+    
+    if can_give_length(a, k, mid):
+        answer = mid
+        left = mid + 1
+    else:
+        right = mid - 1
+
+print(answer)
